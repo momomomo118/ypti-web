@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>YPTI青春成长人格测试</title>
+  <link rel="stylesheet" href="./style.css" />
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./app.js" defer></script>
+</head>
+
+<body>
+  <div class="app">
+
+    <section id="homePage" class="panel hero">
+      <div>
+        <p class="eyebrow">Youth Personality and Trajectory Indicator</p>
+        <h1>YPTI青春成长人格测试</h1>
+        <p class="subtitle">
+          完成30道趣味选择题，找到你的青年成长人格，并生成属于你的青春坐标卡。
+        </p>
+
+        <div class="type-tags">
+          <span>R 科研探索型</span>
+          <span>S 社会服务型</span>
+          <span>I 创新创业型</span>
+          <span>L 组织领导型</span>
+          <span>P 实践应用型</span>
+          <span>C 传播表达型</span>
+        </div>
+
+        <button id="startBtn">开始测试</button>
+      </div>
+
+      <div class="hero-card">
+        <div class="avatar R"></div>
+      </div>
+    </section>
+
+    <section id="quizPage" class="panel hidden">
+      <div class="top-bar">
+        <div>
+          <p class="eyebrow">Step 1</p>
+          <h2>YPTI测试题</h2>
+          <p class="subtitle">请完成全部30道题，提交后系统将自动生成你的青春成长人格。</p>
+        </div>
+
+        <div class="progress-box">
+          已完成：<span id="answeredCount">0</span> / <span id="totalCount">30</span>
+        </div>
+      </div>
+
+      <div id="questionsContainer"></div>
+
+      <div class="bottom-actions">
+        <button id="submitQuizBtn">提交测试并查看结果</button>
+      </div>
+    </section>
+
+    <section id="resultPage" class="panel hidden">
+      <div class="result-layout">
+        <div>
+          <p class="eyebrow">Step 2</p>
+          <h2 id="resultTitle"></h2>
+          <p id="resultText" class="subtitle"></p>
+
+          <div id="scoreGrid" class="score-grid"></div>
+
+          <h3>成长建议</h3>
+          <p id="resultAdvice" class="subtitle"></p>
+
+          <h3>青春宣言</h3>
+          <p id="resultSlogan" class="slogan"></p>
+
+          <div class="bottom-actions">
+            <button id="goCoordinateBtn">填写青春坐标卡</button>
+          </div>
+        </div>
+
+        <div>
+          <div id="resultAvatar" class="avatar R"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="coordinatePage" class="panel hidden">
+      <div class="coordinate-header">
+        <div>
+          <p class="eyebrow">Step 3</p>
+          <h2>青春坐标卡</h2>
+          <p class="subtitle">
+            请结合你的 YPTI 测试结果，从“兴趣、能力、时代需要”三个维度填写个人青春坐标。
+          </p>
+        </div>
+
+        <div class="coordinate-result-card">
+          <span class="mini-label">我的YPTI结果</span>
+          <input id="autoResult" readonly />
+        </div>
+      </div>
+
+      <div class="notice-card">
+        <strong>填写说明：</strong>
+        这张卡片用于把测试结果转化为个人发展方向。X轴代表“我喜欢什么”，Y轴代表“我擅长什么”，Z轴代表“我能回应什么时代需要”，最终坐标用一句话总结自己的青春方向。
+      </div>
+
+      <div class="basic-info-card">
+        <h3>基本信息</h3>
+
+        <div class="form-grid compact-grid">
+          <div class="input-group">
+            <label>姓名或昵称</label>
+            <input id="studentName" placeholder="例如：张三、小组1号、昵称都可以" />
+            <p class="field-tip">用于在班级坐标图上显示你的名字。</p>
+          </div>
+
+          <div class="input-group">
+            <label>班级</label>
+            <input id="className" placeholder="例如：生医2301" />
+            <p class="field-tip">用于后续整理活动材料和班级成果。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="coordinate-dimension-grid">
+        <div class="dimension-card x-card">
+          <div class="dimension-badge">X轴</div>
+          <h3>我的兴趣</h3>
+          <p class="dimension-desc">写你喜欢做什么，愿意往哪个方向发展。</p>
+
+          <div class="example-box">
+            <strong>填写参考：</strong>
+            我喜欢科研探索、志愿服务、创新设计、组织活动、动手实践或表达传播。
+          </div>
+
+          <label>X轴：我的兴趣</label>
+          <textarea
+            id="interestText"
+            placeholder="例如：我喜欢科研探索、实验分析和医学工程相关问题。"
+          ></textarea>
+
+          <label>X轴兴趣倾向</label>
+          <select id="xType">
+            <option value="R">R 科研探索：研究、实验、数据、文献、理论分析</option>
+            <option value="S">S 社会服务：志愿服务、帮助他人、公益实践、基层服务</option>
+            <option value="I">I 创新创业：新点子、产品设计、竞赛、创业项目</option>
+            <option value="L">L 组织领导：组织活动、协调团队、担任负责人</option>
+            <option value="P">P 实践应用：动手操作、实习实践、工程应用、解决现实问题</option>
+            <option value="C">C 传播表达：演讲、主持、写作、拍视频、推文、科普宣传</option>
+          </select>
+
+          <p class="field-tip">这一项决定你在班级坐标图上的横坐标。</p>
+        </div>
+
+        <div class="dimension-card y-card">
+          <div class="dimension-badge">Y轴</div>
+          <h3>我的能力</h3>
+          <p class="dimension-desc">写你擅长什么，当前已经具备哪些优势。</p>
+
+          <div class="example-box">
+            <strong>填写参考：</strong>
+            我擅长分析问题、沟通服务、创意设计、团队协调、实践执行或表达展示。
+          </div>
+
+          <label>Y轴：我的能力</label>
+          <textarea
+            id="abilityText"
+            placeholder="例如：我擅长查找资料、分析问题和整理实验结果。"
+          ></textarea>
+
+          <label>Y轴能力倾向</label>
+          <select id="yType">
+            <option value="R">R 科研探索：查资料、做分析、实验研究、逻辑推理</option>
+            <option value="S">S 社会服务：倾听、沟通、服务、陪伴、共情</option>
+            <option value="I">I 创新创业：提出创意、设计方案、整合资源</option>
+            <option value="L">L 组织领导：分工安排、统筹推进、协调团队</option>
+            <option value="P">P 实践应用：执行、调试、操作、落地完成任务</option>
+            <option value="C">C 传播表达：总结、讲述、展示、写作、影响他人</option>
+          </select>
+
+          <p class="field-tip">这一项决定你在班级坐标图上的纵坐标。</p>
+        </div>
+
+        <div class="dimension-card z-card">
+          <div class="dimension-badge">Z轴</div>
+          <h3>时代需要</h3>
+          <p class="dimension-desc">
+            写你的兴趣和能力可以回应什么社会需求、国家需求或专业需求。
+          </p>
+
+          <div class="example-box">
+            <strong>填写参考：</strong>
+            我能回应科技创新、社会服务、产业发展、集体建设、工程应用或知识传播需求。
+          </div>
+
+          <label>Z轴：时代需要</label>
+          <textarea
+            id="needText"
+            placeholder="例如：我能回应智慧医疗、健康中国和医学技术创新的需求。"
+          ></textarea>
+
+          <p class="field-tip">这一项用于说明你的个人发展方向怎样与时代需求相连接。</p>
+        </div>
+      </div>
+
+      <div class="final-direction-card">
+        <h3>最终坐标：我的青春方向</h3>
+        <p class="subtitle">
+          请用一句完整的话总结你的发展方向。推荐句式：我的青春方向是用【我的能力】回应【时代需要】。
+        </p>
+
+        <div class="example-box final-example">
+          <strong>示例：</strong>
+          我的青春方向是用医学工程知识参与智慧医疗创新。
+          <br />
+          我的青春方向是用实践应用能力回应工程转化和社会服务需求。
+        </div>
+
+        <textarea
+          id="finalDirection"
+          placeholder="例如：我的青春方向是用医学工程知识参与智慧医疗创新。"
+        ></textarea>
+      </div>
+
+      <div class="coordinate-submit-bar">
+        <div class="submit-note">
+          提交后，你的信息将进入班级青春坐标图，用于展示本次团日活动成果。
+        </div>
+        <button id="submitCoordinateBtn">提交到班级坐标图</button>
+      </div>
+    </section>
+
+    <section id="classMapPage" class="panel hidden">
+      <p class="eyebrow">Step 4</p>
+      <h2>班级青春坐标图</h2>
+      <p class="subtitle">
+        每个点代表一位同学，横轴为兴趣倾向，纵轴为能力倾向。
+      </p>
+
+      <h3>班级YPTI类型分布</h3>
+      <div id="typeSummary" class="score-grid"></div>
+
+      <div class="map-wrap">
+        <div class="axis-title x-axis">X轴：兴趣倾向</div>
+        <div class="axis-title y-axis">Y轴：能力倾向</div>
+        <div class="map-label top-label">C 传播表达</div>
+        <div class="map-label bottom-label">R 科研探索</div>
+        <div class="map-label right-label">C 传播表达</div>
+        <div class="map-label left-label">R 科研探索</div>
+        <div id="coordinateMap" class="coordinate-map"></div>
+      </div>
+
+      <h3>青春方向列表</h3>
+      <div id="directionList" class="direction-list"></div>
+
+      <div class="bottom-actions">
+        <button id="backHomeBtn" class="secondary-btn">返回首页</button>
+      </div>
+    </section>
+
+  </div>
+</body>
+</html>
